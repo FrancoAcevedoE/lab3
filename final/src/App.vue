@@ -2,12 +2,14 @@
   <div id="app">
 <LoginView @login-success="setUserID" />
 <DashboardView :userID="userID" />
+<CompraVenta />
   </div>
 </template>
 
 <script>
 import LoginView from './components/LoginView.vue';
 import DashboardView from './components/DashboardView.vue';
+import CompraVenta from './components/CompraVenta.vue';
 
 
 export default {
@@ -15,6 +17,7 @@ export default {
   components: {
     LoginView,
     DashboardView,
+    CompraVenta,
   },
 
   data() {
