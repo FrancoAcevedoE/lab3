@@ -37,13 +37,14 @@ export default {
       },
     };
   },
+
   methods: {
     login() {
       const alphaNumeric = /^[A-Za-z0-9]+$/;
       const onlyNumbers = /^[0-9]+$/;
 
       if (!this.user.userID && !this.user.password) {
-        alert("please enter user ID and password");
+        alert("please complete all fields");
         return;
       }
 
@@ -67,13 +68,11 @@ export default {
         return;
       }
 
-      // guardar en Vuex
+      // guarda en Vuex
       this.$store.commit("setUser", this.user.userID);
 
-      // guardar en localStorage
-      localStorage.setItem("userID", this.user.userID);
-
       alert("login successful");
+      console.log(this.$store);
     },
   },
 };
