@@ -1,29 +1,49 @@
 <template>
-  <div>
-    <div
-      class="log">
-      <h1>Create acount</h1>
+  <div class="page">
+    <div class="title">
+      <img src="../assets/logo.png" alt="Logo" class="logo" />YOUWALLET
+    </div>
+    <div class="log">
+      <h1>Your acount</h1>
       <form action="submit">
         <p>user ID</p>
-        <p>this username only content until 8 letters</p>
-        <input
-          type="text"
-          v-model="user.userID"
-          placeholder="please join user ID"
-        />
+
+        <div class="input-wrapper">
+          <input
+            type="text"
+            v-model="user.userID"
+            placeholder="please join user ID"
+          />
+          <span class="tooltip">
+            Máximo 8 caracteres<br />
+            Solo letras y números
+          </span>
+        </div>
+
         <p>password</p>
-        <p>this password only content numbers the 4 digit</p>
-        <input
-          type="text"
-          v-model="user.password"
-          id="password"
-          placeholder="please join password"
-        />
+        <div class="input-wrapper">
+          <input
+            type="text"
+            v-model="user.password"
+            id="password"
+            placeholder="please join password"
+          />
+          <span class="tooltip">
+            Solo números<br />
+            Exactamente 4 dígitos
+          </span>
+        </div>
         <br /><br />
-        <input type="submit" value="Login" @click.prevent="login" />
+        <input type="submit" value="Login" @click.prevent="login" class="button"/>
       </form>
     </div>
   </div>
+
+  <footer>
+    <p style="text-align: center; margin-top: 20px">
+      &copy; 2024 YouWallet. All rights reserved.
+    </p>
+  </footer>
 </template>
 
 <script>
@@ -67,6 +87,10 @@ export default {
         alert("password must contain only numbers");
         return;
       }
+      if (this.user.password.length !== 4) {
+        alert("password must be exactly 4 digits");
+        return;
+      }
 
       // guarda en Vuex
       this.$store.commit("setUser", this.user.userID);
@@ -78,9 +102,9 @@ export default {
 };
 </script>
 
-
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+@import "../assets/main.css";
 h3 {
   margin: 40px 0 0;
 }
@@ -92,15 +116,77 @@ li {
   display: inline-block;
   margin: 0 10px;
 }
-a {
-  color: #42b983;
+p {
+  font-size: 1.2rem;
+  color: #828282;
+  margin-bottom: 1px
 }
-
+.button {
+  color: rgb(0, 0, 0);
+  background-color: rgb(214, 214, 211);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 20px;
+  cursor: pointer;
+}
+/* logo y titulo */
+.logo {
+  width: 130px;
+  height: 130px;
+  vertical-align: middle;
+}
+.title {
+  font-size: 3.5rem;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
+}
+/* form */
 .log {
-  border: 2px solid black;
+  border: 2px solid rgb(124, 123, 123);
+  box-shadow: 0px 0px 10px 0px rgb(74, 74, 74);
+  border-radius: 1rem;
   width: 400px;
   margin: auto;
   padding: 20px;
-  text-align: left;
+  text-align: center;
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+.log:hover {
+  transform: scale(1.01);
+  box-shadow: 0px 0px 20px 0px rgb(158, 158, 158);
+}
+
+input:hover {
+  box-shadow: 0px 0px 5px 0px rgb(74, 74, 74);
+}
+input:focus {
+  outline: none;
+  border: 1px solid #000;
+  box-shadow: 0 0 4px #000;
+}
+.input-wrapper {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+.tooltip {
+  position: absolute;
+  bottom: 110%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #dadada;
+  color: #2d2d2d;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+.input-wrapper:hover .tooltip {
+  opacity: 1;
 }
 </style>
