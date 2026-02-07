@@ -9,5 +9,4 @@ props: {
   }
 }
 }
-
 </script>
