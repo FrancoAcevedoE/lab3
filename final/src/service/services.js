@@ -1,0 +1,53 @@
+import axios from 'axios';
+
+const apiClient = axios.create({
+  baseURL: "https://laboratorio3-f36a.restdb.io/rest",
+  headers: {
+    "x-apikey": "60eb09146661365596af552f",
+    "Content-Type": "application/json"
+  }
+});
+
+// esto agrega el token a cada request
+apiClient.interceptors.request.use(config => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+export const finishTransaction = async function() {
+    if (!this.validateData()) return;
+    
+    try {
+        // precio de cryptos
+        const price = await this.getCryptoPrice(this.moneda, this.action);
+
+        const total = price * this.cant;
+
+        const res = await apiClient.post('/transactions', {
+            userID: this.userID,
+            type: this.action,
+            crypto: this.moneda,
+            amount: this.cant,
+            price: price,
+            total: total,
+            date: new Date().toISOString()
+        });
+        alert(`Transacción realizada con éxito total: $${total}`);
+        console.log("guardado en RestDB", res.data);
+    } catch (error) {
+        console.error('ERROR', error.res || error);
+        alert('Error al realizar la transacción');
+    }
+    this.resetForm();
+};
+    
+
+
+
+
+
+
+export default apiClient;

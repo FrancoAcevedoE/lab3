@@ -1,21 +1,38 @@
 <template>
   <div id="app">
-    <LoginView/>
+<LoginView @login-success="setUserID" />
+<DashboardView :userID="userID" />
+<CompraVenta />
   </div>
 </template>
 
 <script>
 import LoginView from './components/LoginView.vue';
-
+import DashboardView from './components/DashboardView.vue';
+import CompraVenta from './components/CompraVenta.vue';
 
 
 export default {
   name: 'App',
   components: {
-    LoginView
+    LoginView,
+    DashboardView,
+    CompraVenta,
+  },
+
+  data() {
+    return {
+      userID: ""
+    }
+  },
+  methods: {
+    setUserID(id) {
+      this.userID = id
+    }
   }
 }
 </script>
+
 
 <style>
 #app {
