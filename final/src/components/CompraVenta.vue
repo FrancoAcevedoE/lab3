@@ -1,26 +1,32 @@
 <template>
-  <h1>Componente CompraVenta</h1>
-  <button @click="setAction('purchase')">Comprar</button>
-  <button @click="setAction('sale')">Vender</button>
-  <p v-if="action">
-    Accion seleccionada: <strong>{{ action }}</strong>
-  </p>
+  <div class="box">
+    <h1>BUY AND SELL CRYPTO</h1>
+    <button @click="setAction('purchase')">Comprar</button>
+    <button @click="setAction('sale')">Vender</button>
+    <p v-if="action">
+      Accion seleccionada: <strong>{{ action }}</strong>
+    </p>
 
-  <p>Selección de cryptomoneda</p>
-  <!-- select dinamico desde API -->
-  <select v-model="cryptoSelected">
-    <option value="">Selecione una Crypto</option>
-    <option v-for="crypto in cryptos" :key="crypto" :value="crypto">
-      {{ crypto.toUpperCase() }}
-    </option>
-  </select>
+    <p>Selección de cryptomoneda</p>
+    <!-- select dinamico desde API -->
+    <select v-model="cryptoSelected">
+      <option value="">Selecione una Crypto</option>
+      <option v-for="crypto in cryptos" :key="crypto" :value="crypto">
+        {{ crypto.toUpperCase() }}
+      </option>
+    </select>
 
-  <p>ingrese la cantidad</p>
-  <input type="number" v-model.number="cant" placeholder="cantidad" />
-  <br /><br />
-  <p>cantidad ingresada: {{ cant }}</p>
-
-  <button @click="finishTransaction">Finalizar transacción</button>
+    <p>ingrese la cantidad</p>
+    <input type="number" v-model.number="cant" placeholder="cantidad" />
+    <br /><br />
+    <p>cantidad ingresada: {{ cant }}</p>
+    <input
+      type="submit"
+      value="finish"
+      @click.prevent="finishTransaction"
+      class="input-button"
+    />
+  </div>
 </template>
 
 <script>
@@ -114,4 +120,8 @@ export default {
 };
 </script>
 
-<style></style>
+<style>
+@import "../assets/main.css";
+
+
+</style>

@@ -3,7 +3,7 @@
     <div class="title">
       <img src="../assets/logo.png" alt="Logo" class="logo" />YOUWALLET
     </div>
-    <div class="log">
+    <div class="box">
       <h1>Your acount</h1>
       <form action="submit">
         <p>user ID</p>
@@ -121,14 +121,6 @@ p {
   color: #828282;
   margin-bottom: 1px
 }
-.button {
-  color: rgb(0, 0, 0);
-  background-color: rgb(214, 214, 211);
-  border: none;
-  padding: 10px 20px;
-  border-radius: 20px;
-  cursor: pointer;
-}
 /* logo y titulo */
 .logo {
   width: 130px;
@@ -143,34 +135,7 @@ p {
   color: #333;
 }
 /* form */
-.log {
-  border: 2px solid rgb(124, 123, 123);
-  box-shadow: 0px 0px 10px 0px rgb(74, 74, 74);
-  border-radius: 1rem;
-  width: 400px;
-  margin: auto;
-  padding: 20px;
-  text-align: center;
-  transition: transform 0.2s ease, box-shadow 0.3s ease;
-}
-.log:hover {
-  transform: scale(1.01);
-  box-shadow: 0px 0px 20px 0px rgb(158, 158, 158);
-}
 
-input:hover {
-  box-shadow: 0px 0px 5px 0px rgb(74, 74, 74);
-}
-input:focus {
-  outline: none;
-  border: 1px solid #000;
-  box-shadow: 0 0 4px #000;
-}
-.input-wrapper {
-  position: relative;
-  display: inline-block;
-  width: 100%;
-}
 .tooltip {
   position: absolute;
   bottom: 110%;
@@ -186,7 +151,5 @@ input:focus {
   pointer-events: none;
   transition: opacity 0.2s ease;
 }
-.input-wrapper:hover .tooltip {
-  opacity: 1;
-}
+
 </style>
