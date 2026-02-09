@@ -27,6 +27,11 @@
       class="input-button"
     />
   </div>
+   <footer>
+    <p style="text-align: center; margin-top: 20px">
+      &copy; 2024 YouWallet. All rights reserved.
+    </p>
+  </footer>
 </template>
 
 <script>
@@ -64,9 +69,10 @@ export default {
     // trae las crypto desde la API criptoya y las guarda en el estado del componente
     async loadCryptos() {
       try {
-        const response = await fetch("https://criptoya.com/api/argenbtc/ars");
+        const response = await fetch("http://localhost:3001/cryptos/argenbtc");
         const data = await response.json();
         this.cryptos = data;
+        console.log("Cryptos cargadas:", this.cryptos);
       } catch (error) {
         console.error("Error al cargar las cryptos:", error);
       }
@@ -74,7 +80,7 @@ export default {
 
     // obtiene el precio de la crypto seleccionada desde la API criptoya y lo devuelve segun la accion que se quiera realizar compra o venta
     async getCryptoPrice() {
-      const res = await fetch(`/api/api/argenbtc/${this.cryptoSelected}/ars`);
+      const res = await fetch(`http://localhost:3001/price/argenbtc/${this.cryptoSelected}`);
       const data = await res.json();
 
       // compra al precio de vendedor y venta al precio comprador
@@ -113,8 +119,6 @@ export default {
           `venta realizada \nCrypto: ${this.cryptoSelected}\nRecibido: $${totalARS} ARS`,
         );
       }
-      // compra y venta con validaciones para verificar que el usuario haya iniciado sesion, que
-      // la cantidad no sea negativa y que haya suficiente saldo para realizar la compra
     },
   },
 };
