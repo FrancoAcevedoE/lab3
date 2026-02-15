@@ -52,16 +52,13 @@ export default {
   mounted() {
     this.loadCryptos();
   },
-
   // metodos
-
   methods: {
     // setea la accion a realizar compra o venta
     setAction(type) {
       this.action = type;
     },
-
-    // trae las crypto desde la API criptoya y las guarda en el estado del componente
+   // trae las crypto desde la API criptoya y las guarda en el estado del componente
     async loadCryptos() {
       try {
         const response = await fetch("https://criptoya.com/api/argenbtc/ars");
@@ -71,17 +68,13 @@ export default {
         console.error("Error al cargar las cryptos:", error);
       }
     },
-
     // obtiene el precio de la crypto seleccionada desde la API criptoya y lo devuelve segun la accion que se quiera realizar compra o venta
     async getCryptoPrice() {
       const res = await fetch(`/api/api/argenbtc/${this.cryptoSelected}/ars`);
       const data = await res.json();
-
       // compra al precio de vendedor y venta al precio comprador
-
       return this.action === "purchase" ? data.totalAsk : data.totalBid;
     },
-
     // finaliza la transaccion de compra o venta
     async finishTransaction() {
       if (!this.userID) {
@@ -100,10 +93,8 @@ export default {
         alert("la cantidad debe ser mayor a cero");
         return;
       }
-
       const price = await this.getCryptoPrice();
       const totalARS = price * this.cant;
-
       if (this.action === "purchase") {
         alert(
           `compra realizada \nCrypto: ${this.cryptoSelected}\nGastado: $${totalARS} ARS`,
@@ -122,6 +113,4 @@ export default {
 
 <style>
 @import "../assets/main.css";
-
-
 </style>
