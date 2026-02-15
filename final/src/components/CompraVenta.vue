@@ -11,8 +11,11 @@
     <!-- select dinamico desde API -->
     <select v-model="cryptoSelected">
       <option value="">Selecione una Crypto</option>
-      <option v-for="crypto in cryptos" :key="crypto" :value="crypto">
-        {{ crypto.toUpperCase() }}
+      <option
+        v-for="crypto in cryptos"
+        :key="(typeof crypto === 'string' ? crypto : (crypto.symbol || crypto.id || crypto.name))"
+        :value="formatCryptoValue(crypto)">
+        {{ formatCrypto(crypto) }}
       </option>
     </select>
 
@@ -70,7 +73,15 @@ export default {
       try {
         const response = await fetch("http://localhost:3001/cryptos/argenbtc");
         const data = await response.json();
-        this.cryptos = data;
+        // El API remoto puede devolver un objeto con claves por crypto
+        // Convertir a array de símbolos si es necesario
+        if (Array.isArray(data)) {
+          this.cryptos = data;
+        } else if (data && typeof data === 'object') {
+          this.cryptos = Object.keys(data);
+        } else {
+          this.cryptos = [];
+        }
         console.log("Cryptos cargadas:", this.cryptos);
       } catch (error) {
         console.error("Error al cargar las cryptos:", error);
@@ -78,12 +89,23 @@ export default {
     },
     // obtiene el precio de la crypto seleccionada desde la API criptoya y lo devuelve segun la accion que se quiera realizar compra o venta
     async getCryptoPrice() {
-      const res = await fetch(`/api/api/argenbtc/${this.cryptoSelected}/ars`);
+      // Usar el backend local para evitar CORS y facilitar el proxy
+      const res = await fetch(`http://localhost:3001/price/argenbtc/${this.cryptoSelected}`);
       const data = await res.json();
-
-      
       // compra al precio de vendedor y venta al precio comprador
       return this.action === "purchase" ? data.totalAsk : data.totalBid;
+    },
+    formatCrypto(crypto) {
+      if (typeof crypto === 'string') return crypto.toUpperCase();
+      if (!crypto) return '';
+      const key = crypto.symbol || crypto.id || crypto.name || '';
+      return String(key).toUpperCase();
+    },
+    formatCryptoValue(crypto) {
+      if (typeof crypto === 'string') return crypto.toLowerCase();
+      if (!crypto) return '';
+      const key = crypto.symbol || crypto.id || crypto.name || '';
+      return String(key).toLowerCase();
     },
     // finaliza la transaccion de compra o venta
     async finishTransaction() {
