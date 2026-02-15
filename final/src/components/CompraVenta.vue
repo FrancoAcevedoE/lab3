@@ -49,24 +49,23 @@ export default {
     return {
       cant: 0,
       cryptoSelected: "",
-      cryptos: [],
-      action: null, // propiedad para determinar si es compra o venta
+      cryptos: ["btc", "eth", "ltc", "xrp", "bch"],
+      action: null,
+       // propiedad para determinar si es compra o venta
     };
   },
   // ciclo de vida del componente
   mounted() {
     this.loadCryptos();
   },
-
+  
   // metodos
-
   methods: {
     // setea la accion a realizar compra o venta
     setAction(type) {
       this.action = type;
     },
-
-    // trae las crypto desde la API criptoya y las guarda en el estado del componente
+   // trae las crypto desde la API criptoya y las guarda en el estado del componente
     async loadCryptos() {
       try {
         const response = await fetch("http://localhost:3001/cryptos/argenbtc");
@@ -77,17 +76,15 @@ export default {
         console.error("Error al cargar las cryptos:", error);
       }
     },
-
     // obtiene el precio de la crypto seleccionada desde la API criptoya y lo devuelve segun la accion que se quiera realizar compra o venta
     async getCryptoPrice() {
-      const res = await fetch(`http://localhost:3001/price/argenbtc/${this.cryptoSelected}`);
+      const res = await fetch(`/api/api/argenbtc/${this.cryptoSelected}/ars`);
       const data = await res.json();
 
+      
       // compra al precio de vendedor y venta al precio comprador
-
       return this.action === "purchase" ? data.totalAsk : data.totalBid;
     },
-
     // finaliza la transaccion de compra o venta
     async finishTransaction() {
       if (!this.userID) {
@@ -106,10 +103,24 @@ export default {
         alert("la cantidad debe ser mayor a cero");
         return;
       }
-
       const price = await this.getCryptoPrice();
       const totalARS = price * this.cant;
-
+      
+      // Crear objeto de transacción
+      const transaction = {
+        id: Date.now(),
+        userID: this.userID,
+        type: this.action === "purchase" ? "compra" : "venta",
+        crypto: this.cryptoSelected.toUpperCase(),
+        amount: this.cant,
+        price: price,
+        totalARS: totalARS,
+        date: new Date().toLocaleDateString('es-AR')
+      };
+      
+      // Guardar en el store de Vuex
+      this.$store.commit('addTransaction', transaction);
+      
       if (this.action === "purchase") {
         alert(
           `compra realizada \nCrypto: ${this.cryptoSelected}\nGastado: $${totalARS} ARS`,
@@ -119,6 +130,8 @@ export default {
           `venta realizada \nCrypto: ${this.cryptoSelected}\nRecibido: $${totalARS} ARS`,
         );
       }
+      // compra y venta con validaciones para verificar que el usuario haya iniciado sesion, que
+      // la cantidad no sea negativa y que haya suficiente saldo para realizar la compra
     },
   },
 };
@@ -126,6 +139,4 @@ export default {
 
 <style>
 @import "../assets/main.css";
-
-
 </style>

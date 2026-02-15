@@ -3,6 +3,7 @@
     <nav>
       <router-link to="/login">Login</router-link>
       <router-link to="/market">Market</router-link>
+      <router-link to="/history">History</router-link>
     </nav>
     <router-view />
   </div>
