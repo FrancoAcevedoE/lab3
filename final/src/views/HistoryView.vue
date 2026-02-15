@@ -1,6 +1,5 @@
 <template>
   <div>
-    <h1>History</h1>
     <History/>
   </div>
 </template>

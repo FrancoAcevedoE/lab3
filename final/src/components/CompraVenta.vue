@@ -44,14 +44,16 @@ export default {
     return {
       cant: 0,
       cryptoSelected: "",
-      cryptos: [],
-      action: null, // propiedad para determinar si es compra o venta
+      cryptos: ["btc", "eth", "ltc", "xrp", "bch"],
+      action: null,
+       // propiedad para determinar si es compra o venta
     };
   },
   // ciclo de vida del componente
   mounted() {
     this.loadCryptos();
   },
+  
   // metodos
   methods: {
     // setea la accion a realizar compra o venta
@@ -70,8 +72,17 @@ export default {
     },
     // obtiene el precio de la crypto seleccionada desde la API criptoya y lo devuelve segun la accion que se quiera realizar compra o venta
     async getCryptoPrice() {
-      const res = await fetch(`/api/api/argenbtc/${this.cryptoSelected}/ars`);
+      const crypto = this.cryptoSelected.toUpperCase();
+      const amount = this.cant;
+
+      const res = await fetch(
+    `https://criptoya.com/api/lemoncash/${crypto}/ARS/${amount}`);
+    if (!res.ok) {
+      throw new Error("Error al obtener el precio de la crypto");
+    }
       const data = await res.json();
+
+      
       // compra al precio de vendedor y venta al precio comprador
       return this.action === "purchase" ? data.totalAsk : data.totalBid;
     },
@@ -95,6 +106,22 @@ export default {
       }
       const price = await this.getCryptoPrice();
       const totalARS = price * this.cant;
+      
+      // Crear objeto de transacción
+      const transaction = {
+        id: Date.now(),
+        userID: this.userID,
+        type: this.action === "purchase" ? "compra" : "venta",
+        crypto: this.cryptoSelected.toUpperCase(),
+        amount: this.cant,
+        price: price,
+        totalARS: totalARS,
+        date: new Date().toLocaleDateString('es-AR')
+      };
+      
+      // Guardar en el store de Vuex
+      this.$store.commit('addTransaction', transaction);
+      
       if (this.action === "purchase") {
         alert(
           `compra realizada \nCrypto: ${this.cryptoSelected}\nGastado: $${totalARS} ARS`,
@@ -104,6 +131,11 @@ export default {
           `venta realizada \nCrypto: ${this.cryptoSelected}\nRecibido: $${totalARS} ARS`,
         );
       }
+      
+      // Limpiar el formulario
+      this.cant = 0;
+      this.cryptoSelected = "";
+      this.action = null;
       // compra y venta con validaciones para verificar que el usuario haya iniciado sesion, que
       // la cantidad no sea negativa y que haya suficiente saldo para realizar la compra
     },
