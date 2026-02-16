@@ -13,11 +13,12 @@
       <option value="">Selecione una Crypto</option>
       <option
         v-for="crypto in cryptos"
-        :key="(typeof crypto === 'string' ? crypto : (crypto.symbol || crypto.id || crypto.name))"
-        :value="formatCryptoValue(crypto)">
-        {{ formatCrypto(crypto) }}
+        :key="crypto.id"
+        :value="crypto.id">
+        {{ crypto.name }}
       </option>
     </select>
+    <p v-if="cryptoPrice">valor de la moneda en ARS: <strong>{{ cryptoPrice }}</strong></p>
 
     <p>ingrese la cantidad</p>
     <input type="number" v-model.number="cant" placeholder="cantidad" />
@@ -32,7 +33,7 @@
   </div>
    <footer>
     <p style="text-align: center; margin-top: 20px">
-      &copy; 2024 YouWallet. All rights reserved.
+      &copy; 2024 YouWallet by Franco. All rights reserved.
     </p>
   </footer>
 </template>
@@ -52,8 +53,9 @@ export default {
     return {
       cant: 0,
       cryptoSelected: "",
-      cryptos: ["btc", "eth", "ltc", "xrp", "bch"],
+      cryptos: [""],
       action: null,
+      cryptoPrice: null,
        // propiedad para determinar si es compra o venta
     };
   },
@@ -61,18 +63,40 @@ export default {
   mounted() {
     this.loadCryptos();
   },
-  
+  // watch para actualizar el precio cada vez que se seleccione una crypto o se cambie la accion
+  watch: {
+  async cryptoSelected(newCrypto) {
+    if (!newCrypto || !this.action) {
+      this.cryptoPrice = null;
+      return;
+    }
+
+    try {
+      this.cryptoPrice = await this.getCryptoPrice();
+    } catch (e) {
+      console.error("Error obteniendo precio", e);
+      this.cryptoPrice = null;
+    }
+  },
+
+  async action() {
+    if (this.cryptoSelected) {
+      this.cryptoPrice = await this.getCryptoPrice();
+    }
+  }
+}, 
   // metodos
   methods: {
     // setea la accion a realizar compra o venta
     setAction(type) {
       this.action = type;
     },
+
    // trae las crypto desde la API criptoya y las guarda en el estado del componente
     async loadCryptos() {
       try {
-        const response = await fetch("http://localhost:3001/cryptos/argenbtc");
-        const data = await response.json();
+        const res = await fetch("http://localhost:3001/cryptos");
+        const data = await res.json();
         // El API remoto puede devolver un objeto con claves por crypto
         // Convertir a array de símbolos si es necesario
         if (Array.isArray(data)) {
@@ -87,26 +111,17 @@ export default {
         console.error("Error al cargar las cryptos:", error);
       }
     },
-    // obtiene el precio de la crypto seleccionada desde la API criptoya y lo devuelve segun la accion que se quiera realizar compra o venta
+//esto es para que cada vez que se seleccione una crypto 
+// o se cambie la accion se actualice el precio de la crypto seleccionada
     async getCryptoPrice() {
-      // Usar el backend local para evitar CORS y facilitar el proxy
-      const res = await fetch(`http://localhost:3001/price/argenbtc/${this.cryptoSelected}`);
+      const res = await fetch(`http://localhost:3001/price/lemoncash/${this.cryptoSelected}`);
       const data = await res.json();
+
       // compra al precio de vendedor y venta al precio comprador
       return this.action === "purchase" ? data.totalAsk : data.totalBid;
     },
-    formatCrypto(crypto) {
-      if (typeof crypto === 'string') return crypto.toUpperCase();
-      if (!crypto) return '';
-      const key = crypto.symbol || crypto.id || crypto.name || '';
-      return String(key).toUpperCase();
-    },
-    formatCryptoValue(crypto) {
-      if (typeof crypto === 'string') return crypto.toLowerCase();
-      if (!crypto) return '';
-      const key = crypto.symbol || crypto.id || crypto.name || '';
-      return String(key).toLowerCase();
-    },
+
+
     // finaliza la transaccion de compra o venta
     async finishTransaction() {
       if (!this.userID) {
@@ -152,8 +167,6 @@ export default {
           `venta realizada \nCrypto: ${this.cryptoSelected}\nRecibido: $${totalARS} ARS`,
         );
       }
-      // compra y venta con validaciones para verificar que el usuario haya iniciado sesion, que
-      // la cantidad no sea negativa y que haya suficiente saldo para realizar la compra
     },
   },
 };

@@ -69,32 +69,32 @@ export default {
       }
 
       if (!this.user.userID) {
-        alert("please enter user ID");
+        // alert("please enter user ID");
         return;
       }
 
       if (!this.user.password) {
-        alert("please enter password");
+        // alert("please enter password");
         return;
       }
 
       if (!alphaNumeric.test(this.user.userID)) {
-        alert("user ID must contain only letters and numbers");
+        // alert("user ID must contain only letters and numbers");
         return;
       }
 
       if (!onlyNumbers.test(this.user.password)) {
-        alert("password must contain only numbers");
+        // alert("password must contain only numbers");
         return;
       }
       if (this.user.password.length !== 4) {
-        alert("password must be exactly 4 digits");
+        // alert("password must be exactly 4 digits");
         return;
       }
 
       // guarda en Vuex
       this.$store.commit("setUser", this.user.userID);
-      alert("login successful");
+      // alert("login successful");
       console.log(this.$store);
       // redirigir a la vista principal una vez autenticado
       this.$router.push('/market');
