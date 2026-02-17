@@ -8,7 +8,7 @@
     </p>
 
     <p>Selección de cryptomoneda</p>
-    <!-- select dinamico desde API -->
+    <!-- esto lo llama desde la api -->
     <select v-model="cryptoSelected">
       <option value="">Selecione una Crypto</option>
       <option
@@ -56,10 +56,10 @@ export default {
       cryptos: [""],
       action: null,
       cryptoPrice: null,
-       // propiedad para determinar si es compra o venta
     };
   },
-  // ciclo de vida del componente
+
+
   mounted() {
     this.loadCryptos();
   },
@@ -85,20 +85,18 @@ export default {
     }
   }
 }, 
-  // metodos
+
   methods: {
-    // setea la accion a realizar compra o venta
+    // es para saber si va a realizar compra o venta
     setAction(type) {
       this.action = type;
     },
 
-   // trae las crypto desde la API criptoya y las guarda en el estado del componente
+   // trae las crypto desde la API criptoya y las guarda
     async loadCryptos() {
       try {
         const res = await fetch("http://localhost:3001/cryptos");
         const data = await res.json();
-        // El API remoto puede devolver un objeto con claves por crypto
-        // Convertir a array de símbolos si es necesario
         if (Array.isArray(data)) {
           this.cryptos = data;
         } else if (data && typeof data === 'object') {
@@ -166,8 +164,6 @@ export default {
           `venta realizada \nCrypto: ${this.cryptoSelected}\nRecibido: $${totalARS} ARS`,
         );
       }
-      
-      // Limpiar formulario
       this.cant = 0;
       this.cryptoSelected = "";
       this.action = null;

@@ -34,7 +34,12 @@
           </span>
         </div>
         <br /><br />
-        <input type="submit" value="Login" @click.prevent="login" class="button"/>
+        <input
+          type="submit"
+          value="Login"
+          @click.prevent="login"
+          class="button"
+        />
       </form>
     </div>
   </div>
@@ -91,20 +96,18 @@ export default {
         // alert("password must be exactly 4 digits");
         return;
       }
-
       // guarda en Vuex y localStorage
       this.$store.commit("setUser", this.user.userID);
       localStorage.setItem("userID", this.user.userID);
       // alert("login successful");
       console.log(this.$store);
       // redirigir a la vista principal una vez autenticado
-      this.$router.push('/market');
+      this.$router.push("/market");
     },
   },
 };
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 @import "../assets/main.css";
 h3 {
@@ -121,7 +124,7 @@ li {
 p {
   font-size: 1.2rem;
   color: #828282;
-  margin-bottom: 1px
+  margin-bottom: 1px;
 }
 /* logo y titulo */
 .logo {
@@ -153,5 +156,4 @@ p {
   pointer-events: none;
   transition: opacity 0.2s ease;
 }
-
 </style>

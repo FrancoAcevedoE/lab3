@@ -5,28 +5,14 @@ const cors = require("cors");
 const app = express();
 const PORT = 3001;
 
-// Configuración de CORS para el frontend
+// Configuración de CORS para el front
 app.use(cors({
-  origin: "http://localhost:8080", // Puerto del frontend Vue
+  origin: "http://localhost:8080", // Puerto del frontend
   credentials: true
 }));
 app.use(express.json());
 
-// // Obtener lista de cryptos disponibles
-// app.get("/cryptos/:exchange", async (req, res) => {
-//   const { exchange } = req.params;
-
-//   try {
-//     const url = `https://criptoya.com/api/${exchange}`;
-//     const response = await axios.get(url);
-//     res.json(response.data);
-//   } catch (error) {
-//     console.error("CriptoYa error:", error.response?.data || error.message);
-//     res.status(500).json({ error: "Error fetching cryptos data" });
-//   }
-// });
-
-// Obtener precio de una crypto específica
+// trae precio de una crypto específica
 app.get("/price/:exchange/:crypto", async (req, res) => {
   const { exchange, crypto } = req.params;
 

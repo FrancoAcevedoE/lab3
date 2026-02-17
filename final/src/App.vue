@@ -1,9 +1,7 @@
 <template>
   <div id="app">
     <nav>
-      <template v-if="!isAuthenticated">
-        <!-- Cuando no está autenticado, no mostramos router-links de la app -->
-      </template>
+      <template v-if="!isAuthenticated"> </template>
       <template v-else>
         <router-link to="/market" class="router">Market</router-link>
         <router-link to="/history" class="router">History</router-link>
@@ -11,25 +9,20 @@
       </template>
     </nav>
 
-    <!-- Si no está autenticado renderizamos el componente de Login directamente
-         para evitar que `router-view` cargue otras rutas; una vez autenticado
-         usamos `router-view` normalmente -->
     <LoginView v-if="!isAuthenticated" />
     <router-view v-else />
   </div>
 </template>
 
 <script>
-import LoginView from './components/LoginView.vue'
+import LoginView from "./components/LoginView.vue";
 
 export default {
-  name: 'App',
+  name: "App",
   components: {
-    LoginView
+    LoginView,
   },
   mounted() {
-    // Cargar userID de localStorage al iniciar
-    // Al hacer setUser, automáticamente se cargarán sus transacciones del localStorage
     const savedUserID = localStorage.getItem("userID");
     if (savedUserID) {
       this.$store.commit("setUser", savedUserID);
@@ -38,19 +31,17 @@ export default {
   computed: {
     isAuthenticated() {
       return !!this.$store.state.userID;
-    }
+    },
   },
   methods: {
     logout() {
-      this.$store.commit('logout');
+      this.$store.commit("logout");
       localStorage.removeItem("userID");
-      // No remover las transacciones ya que contienen datos de otros usuarios
-      this.$router.push('/login');
-    }
-  }
-}
+      this.$router.push("/login");
+    },
+  },
+};
 </script>
-
 
 <style>
 @import "./assets/main.css";

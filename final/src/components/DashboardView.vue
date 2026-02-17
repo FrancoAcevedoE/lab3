@@ -10,3 +10,5 @@ props: {
 }
 }
 </script>
+
+<!-- el dashboard es una interfaz grafica que centra, organiza y visaliza datos claves -->

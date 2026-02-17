@@ -1,9 +1,7 @@
 <template>
   <div class="history-view">
     <h1>HISTORY</h1>
-    
     <div class="content-wrapper">
-      <!-- Sección de tabla -->
       <div class="table-section">
         <table border="1" v-if="transactions.length > 0">
           <thead>
@@ -35,7 +33,7 @@
         <p v-else>No hay transacciones registradas</p>
       </div>
 
-      <!-- Sección de gráficos -->
+      <!-- chart es la libreria gráficos -->
       <div class="charts-section" v-if="transactions.length">
         <div class="charts">
           <div class="chart-container">
@@ -237,8 +235,6 @@ export default {
         alert("Ingrese un monto válido mayor a 0");
         return;
       }
-      
-      // Actualizar localmente
       tx.totalARS = moneyValue;
       
       // Si existe ID de API remota, hacer PATCH
@@ -393,8 +389,6 @@ p {
   height: 100% !important;
   max-width: 100%;
 }
-
-/* Tablets grandes */
 @media (max-width: 1200px) {
   .history-view {
     padding: 12px;
@@ -425,7 +419,6 @@ p {
   }
 }
 
-/* Tablets */
 @media (max-width: 1024px) {
   .history-view {
     padding: 10px;
@@ -465,7 +458,6 @@ p {
   }
 }
 
-/* Tablets pequeñas y grandes móviles */
 @media (max-width: 768px) {
   .history-view {
     padding: 8px;
@@ -506,7 +498,6 @@ p {
   }
 }
 
-/* Móviles medianos */
 @media (max-width: 600px) {
   .history-view {
     display: grid;
@@ -544,7 +535,6 @@ p {
   }
 }
 
-/* Móviles pequeños */
 @media (max-width: 480px) {
   .history-view {
     padding: 4px;
@@ -595,7 +585,6 @@ p {
   }
 }
 
-/* Ultra móviles */
 @media (max-width: 360px) {
   .history-view {
     padding: 2px;

@@ -1,9 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 
-// login está en components
 import LoginView from "../components/LoginView.vue";
 
-// market está en views
 import MarketView from "../views/Market.vue";
 
 import HistoryView from "../views/HistoryView.vue";
