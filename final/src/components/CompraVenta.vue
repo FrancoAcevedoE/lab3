@@ -1,6 +1,9 @@
 <template>
   <div class="box">
     <h1>BUY AND SELL CRYPTO</h1>
+    <div class="balance-display">
+      <p>Saldo: <strong>${{ formattedBalance }}</strong> ARS</p>
+    </div>
     <button @click="setAction('purchase')">Comprar</button>
     <button @click="setAction('sale')">Vender</button>
     <p v-if="action">
@@ -58,6 +61,12 @@ export default {
       cryptoPrice: null,
     };
   },
+  computed: {
+    formattedBalance() {
+      const balance = this.$store.getters.getCurrentUserBalance;
+      return balance.toLocaleString('es-AR');
+    }
+  },
 
 
   mounted() {
@@ -70,6 +79,7 @@ export default {
       this.cryptoPrice = null;
       return;
     }
+    console.log('crypto selected ok')
 
     try {
       this.cryptoPrice = await this.getCryptoPrice();
@@ -114,7 +124,6 @@ export default {
     async getCryptoPrice() {
       const res = await fetch(`http://localhost:3001/price/lemoncash/${this.cryptoSelected}`);
       const data = await res.json();
-
       // compra al precio de vendedor y venta al precio comprador
       return this.action === "purchase" ? data.totalAsk : data.totalBid;
     },
@@ -140,6 +149,7 @@ export default {
       }
       const price = await this.getCryptoPrice();
       const totalARS = price * this.cant;
+      
       
       // Crear objeto de transacción
       const transaction = {
@@ -175,4 +185,24 @@ export default {
 
 <style>
 @import "../assets/main.css";
+
+.balance-display {
+  background-color: #f0f0f0;
+  border: 2px solid #333;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.balance-display p {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.balance-display strong {
+  color: #2d7a3e;
+  font-size: 1.2rem;
+}
 </style>

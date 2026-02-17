@@ -1,6 +1,19 @@
 <template>
   <div class="history-view">
     <h1>HISTORY</h1>
+    <!-- esta parte es el balance de saldos y cryptos -->
+    <div class="balance-display">
+      <p>Saldo Disponible: <strong>${{ formattedBalance }}</strong> ARS</p>
+    </div>
+    <div class="crypto-balance-display" v-if="Object.keys(filteredCryptoBalance).length > 0">
+      <p>Saldo de Cryptos:</p>
+      <div class="crypto-list">
+        <div class="crypto-item" v-for="(amount, crypto) in filteredCryptoBalance" :key="crypto">
+          <span class="crypto-name">{{ crypto }}:</span>
+          <span class="crypto-amount">{{ amount.toFixed(8) }}</span>
+        </div>
+      </div>
+    </div>
     <div class="content-wrapper">
       <div class="table-section">
         <table border="1" v-if="transactions.length > 0">
@@ -70,8 +83,11 @@ export default {
   computed: {
     transactions() {
       return this.$store.getters.getTransactions;
-    },
-    // esto es el grafico
+    },    formattedBalance() {
+      const balance = this.$store.getters.getCurrentUserBalance;
+      return balance.toLocaleString('es-AR');
+
+    },    // esto es el grafico
     buyData() {
       const result = {};
       this.transactions.filter(t => t.type === "compra").forEach(t => {
@@ -98,6 +114,35 @@ export default {
       });
 
       return { invested, realized };
+    },
+    cryptoBalance() {
+      const balance = {};
+      this.transactions.forEach(t => {
+        if (!balance[t.crypto]) {
+          balance[t.crypto] = { comprada: 0, vendida: 0 };
+        }
+        if (t.type === "compra") {
+          balance[t.crypto].comprada += t.amount;
+        } else {
+          balance[t.crypto].vendida += t.amount;
+        }
+      });
+      
+      // Calcular saldo final de cada crypto
+      const resultado = {};
+      Object.keys(balance).forEach(crypto => {
+        resultado[crypto] = balance[crypto].comprada - balance[crypto].vendida;
+      });
+      return resultado;
+    },
+    filteredCryptoBalance() {
+      const filtered = {};
+      Object.keys(this.cryptoBalance).forEach(crypto => {
+        if (this.cryptoBalance[crypto] > 0) {
+          filtered[crypto] = this.cryptoBalance[crypto];
+        }
+      });
+      return filtered;
     }
   },
   mounted() {
@@ -180,6 +225,7 @@ export default {
       });
       this.chartInstances.push(chart);
     },
+    //balance de saldos con los graficos libreria chart
     renderBalance() {
       const balanceCanvas = this.$refs.balanceChart;
       if (!balanceCanvas) return;
@@ -256,6 +302,7 @@ export default {
         });
         
         if (!response.ok) {
+            //esto esta puesto por si rompe la primera
           // Intenta con la API alternativa
           const fallbackResponse = await fetch(`https://labor3-d60e.restdb.io/rest/transactions/${id}`, {
             method: 'PATCH',
@@ -294,6 +341,69 @@ h1 {
   margin: 0 0 20px 0;
   color: #333;
   font-size: 2rem;
+}
+
+.balance-display {
+  background-color: #f0f0f0;
+  border: 2px solid #333;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.balance-display p {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.balance-display strong {
+  color: #2d7a3e;
+  font-size: 1.2rem;
+}
+
+.crypto-balance-display {
+  background-color: #e8f5e9;
+  border: 2px solid #4caf50;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+.crypto-balance-display p {
+  margin: 0 0 10px 0;
+  font-size: 1rem;
+  color: #333;
+  font-weight: bold;
+}
+
+.crypto-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.crypto-item {
+  background-color: white;
+  border: 1px solid #4caf50;
+  border-radius: 6px;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+}
+
+.crypto-name {
+  color: #2d7a3e;
+  font-weight: bold;
+  min-width: 60px;
+}
+
+.crypto-amount {
+  color: #333;
+  font-family: monospace;
 }
 
 .content-wrapper {
@@ -508,6 +618,15 @@ p {
   h1 {
     font-size: 1.1rem;
     margin-bottom: 10px;
+  }
+
+  .crypto-list {
+    gap: 8px;
+  }
+
+  .crypto-item {
+    font-size: 0.8rem;
+    padding: 6px 10px;
   }
 
   table {

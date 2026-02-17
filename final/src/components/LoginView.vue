@@ -69,39 +69,38 @@ export default {
       const onlyNumbers = /^[0-9]+$/;
 
       if (!this.user.userID && !this.user.password) {
-        alert("please complete all fields");
+        alert("por favor complete los campos");
         return;
       }
 
       if (!this.user.userID) {
-        // alert("please enter user ID");
+        alert("por favor ingrese el usuario");
         return;
       }
 
       if (!this.user.password) {
-        // alert("please enter password");
+        alert("por favor ingrese la contraseña");
         return;
       }
 
       if (!alphaNumeric.test(this.user.userID)) {
-        // alert("user ID must contain only letters and numbers");
+        alert("el usuario puede contar solo con letras y numeros");
         return;
       }
 
       if (!onlyNumbers.test(this.user.password)) {
-        // alert("password must contain only numbers");
+        alert("la contrase;a solo pueden ser numeros");
         return;
       }
       if (this.user.password.length !== 4) {
-        // alert("password must be exactly 4 digits");
+        alert("la contraseña debe tener exacatamente 4 digitos");
         return;
       }
       // guarda en Vuex y localStorage
       this.$store.commit("setUser", this.user.userID);
       localStorage.setItem("userID", this.user.userID);
-      // alert("login successful");
+       alert("login successful");
       console.log(this.$store);
-      // redirigir a la vista principal una vez autenticado
       this.$router.push("/market");
     },
   },
@@ -126,7 +125,7 @@ p {
   color: #828282;
   margin-bottom: 1px;
 }
-/* logo y titulo */
+
 .logo {
   width: 130px;
   height: 130px;
@@ -139,7 +138,7 @@ p {
   margin-bottom: 20px;
   color: #333;
 }
-/* form */
+
 
 .tooltip {
   position: absolute;
