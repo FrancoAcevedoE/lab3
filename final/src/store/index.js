@@ -112,6 +112,42 @@ export default createStore({
       const filtered = allTransactions.filter((tx) => tx.id !== id);
       localStorage.setItem("transactions", JSON.stringify(filtered));
     },
+
+
+editTransaction(state, updatedTx) {
+      const index = state.transactions.findIndex((t) => t.id === updatedTx.id);
+      if (index !== -1) {
+        const oldTx = state.transactions[index];
+        const balances = JSON.parse(localStorage.getItem("balances") || "{}");
+
+        // volver saldo a la transaccion anterior
+        if (oldTx.type === "compra") {
+          balances[state.userID] += oldTx.totalARS;
+        } else if (oldTx.type === "venta") {
+          balances[state.userID] -= oldTx.totalARS;
+        }
+
+        if (updatedTx.type === "compra") {
+          balances[state.userID] -= updatedTx.totalARS;
+        } else if (updatedTx.type === "venta") {
+          balances[state.userID] += updatedTx.totalARS;
+        }
+
+        state.balances = balances;
+        localStorage.setItem("balances", JSON.stringify(balances));
+
+        // Actualizar el estado
+        state.transactions.splice(index, 1, updatedTx);
+
+        // Actualizar en ek localStorage
+        const allTransactions = JSON.parse(localStorage.getItem("transactions") || "[]");
+        const globalIndex = allTransactions.findIndex(t => t.id === updatedTx.id);
+        if (globalIndex !== -1) {
+          allTransactions[globalIndex] = updatedTx;
+          localStorage.setItem("transactions", JSON.stringify(allTransactions));
+        }
+      }
+    },
     setTransactions(state, transactions) {
       state.transactions = transactions;
     },
@@ -123,6 +159,20 @@ export default createStore({
     },
     getCurrentUserBalance: (state) => {
       return state.balances[state.userID] || 565634343;
+    },
+    getCryptoBalances: (state) => {
+      const balance = {};
+      state.transactions.forEach(t => {
+        if (!balance[t.crypto]) {
+          balance[t.crypto] = 0;
+        }
+        if (t.type === "compra") {
+          balance[t.crypto] += t.amount;
+        } else {
+          balance[t.crypto] -= t.amount;
+        }
+      });
+      return balance;
     },
   },
 });

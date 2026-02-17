@@ -4,15 +4,16 @@
       <img src="../assets/logo.png" alt="Logo" class="logo" />YOUWALLET
     </div>
     <div class="box">
-      <h1>Your acount</h1>
-      <form action="submit">
-        <p>user ID</p>
-
+      <h1>Your Account</h1>
+      <form @submit.prevent="login">
+        <label for="userID">User ID</label>
         <div class="input-wrapper">
           <input
             type="text"
+            id="userID"
             v-model="user.userID"
-            placeholder="please join user ID"
+            placeholder="Enter User ID"
+            autocomplete="username"
           />
           <span class="tooltip">
             Máximo 8 caracteres<br />
@@ -20,33 +21,35 @@
           </span>
         </div>
 
-        <p>password</p>
+        <label for="password">Password</label>
         <div class="input-wrapper">
           <input
-            type="text"
+            type="password"
             v-model="user.password"
             id="password"
-            placeholder="please join password"
+            placeholder="Enter Password"
+            inputmode="numeric"
+            autocomplete="current-password"
           />
           <span class="tooltip">
             Solo números<br />
             Exactamente 4 dígitos
           </span>
         </div>
+
+        <div v-if="errorMessage" class="error-message">
+          {{ errorMessage }}
+        </div>
+
         <br /><br />
-        <input
-          type="submit"
-          value="Login"
-          @click.prevent="login"
-          class="button"
-        />
+        <button type="submit" class="button login-button">Login</button>
       </form>
     </div>
   </div>
 
   <footer>
     <p style="text-align: center; margin-top: 20px">
-      &copy; 2024 YouWallet. All rights reserved.
+      &copy; {{ new Date().getFullYear() }} YouWallet. All rights reserved.
     </p>
   </footer>
 </template>
@@ -60,50 +63,56 @@ export default {
         userID: "",
         password: "",
       },
+      errorMessage: "",
     };
+  },
+  mounted() {
+    if (this.$store.state.userID) {
+      this.$router.push("/market");
+    }
   },
 
   methods: {
     login() {
+      this.errorMessage = "";
       const alphaNumeric = /^[A-Za-z0-9]+$/;
       const onlyNumbers = /^[0-9]+$/;
 
       if (!this.user.userID && !this.user.password) {
-        alert("por favor complete los campos");
+        this.errorMessage = "Por favor complete los campos";
         return;
       }
 
       if (!this.user.userID) {
-        alert("por favor ingrese el usuario");
+        this.errorMessage = "Por favor ingrese el usuario";
         return;
       }
 
       if (!this.user.password) {
-        alert("por favor ingrese la contraseña");
+        this.errorMessage = "Por favor ingrese la contraseña";
         return;
       }
 
       if (!alphaNumeric.test(this.user.userID)) {
-        alert("el usuario puede contar solo con letras y numeros");
+        this.errorMessage = "El usuario puede contar solo con letras y números";
         return;
       }
 
       if (!onlyNumbers.test(this.user.password)) {
-        alert("la contrase;a solo pueden ser numeros");
+        this.errorMessage = "La contraseña solo pueden ser números";
         return;
       }
       if (this.user.password.length !== 4) {
-        alert("la contraseña debe tener exacatamente 4 digitos");
+        this.errorMessage = "La contraseña debe tener exactamente 4 dígitos";
         return;
       }
       // guarda en Vuex y localStorage
       this.$store.commit("setUser", this.user.userID);
       localStorage.setItem("userID", this.user.userID);
-       alert("login successful");
       console.log(this.$store);
       this.$router.push("/market");
     },
-  },
+  }
 };
 </script>
 
@@ -154,5 +163,19 @@ p {
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.2s ease;
+}
+.error-message {
+  color: #d9534f;
+  margin-top: 10px;
+  font-weight: bold;
+  text-align: center;
+}
+
+label {
+  display: block;
+  text-align: left;
+  margin-bottom: 5px;
+  color: #555;
+  font-weight: bold;
 }
 </style>

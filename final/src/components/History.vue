@@ -30,16 +30,34 @@
           </thead>
           <tbody>
             <tr v-for="tx in transactions" :key="tx.id">
-              <td>{{ tx.type }}</td>
-              <td>{{ tx.crypto }}</td>
-              <td>{{ tx.amount }}</td>
-              <td>${{ tx.price }}</td>
-              <td>${{ tx.totalARS }}</td>
-              <td>{{ tx.date }}</td>
-              <td>
-                <button @click="deleteTransaction(tx.id)">Eliminar</button>
-                <button @click="editTx(tx)">Editar</button>
-              </td>
+              <template v-if="editingId === tx.id">
+                 <td>{{ tx.type }}</td>
+                 <td>{{ tx.crypto }}</td>
+                 <td>
+                    <input type="number" v-model.number="editForm.amount" step="any" class="edit-input">
+                 </td>
+                 <td>${{ Number(tx.price).toLocaleString('es-AR') }}</td>
+                 <td>
+                    <input type="number" v-model.number="editForm.totalARS" step="any" class="edit-input">
+                 </td>
+                 <td>{{ tx.date }}</td>
+                 <td class="actions-cell">
+                    <button @click="saveEdit(tx)" class="btn-save">Guardar</button>
+                    <button @click="cancelEdit" class="btn-cancel">Cancelar</button>
+                 </td>
+              </template>
+              <template v-else>
+                  <td>{{ tx.type }}</td>
+                  <td>{{ tx.crypto }}</td>
+                  <td>{{ tx.amount }}</td>
+                  <td>${{ Number(tx.price).toLocaleString('es-AR') }}</td>
+                  <td>${{ Number(tx.totalARS).toLocaleString('es-AR') }}</td>
+                  <td>{{ tx.date }}</td>
+                  <td class="actions-cell">
+                    <button @click="editTx(tx)" class="btn-edit">Editar</button>
+                    <button @click="deleteTransaction(tx.id)" class="btn-delete">Eliminar</button>
+                  </td>
+              </template>
             </tr>
           </tbody>
         </table>
@@ -49,10 +67,10 @@
       <!-- chart es la libreria gráficos -->
       <div class="charts-section" v-if="transactions.length">
         <div class="charts">
-          <div class="chart-container">
+          <div class="chart-container" v-if="Object.keys(buyData).length > 0">
             <canvas ref="buyChart"></canvas>
           </div>
-          <div class="chart-container">
+          <div class="chart-container" v-if="Object.keys(sellData).length > 0">
             <canvas ref="sellChart"></canvas>
           </div>
           <div class="chart-container">
@@ -65,6 +83,7 @@
 </template>
 
 <script>
+
 import Chart from "chart.js/auto";
 
 export default {
@@ -77,16 +96,21 @@ export default {
   },
   data() {
     return {
-      chartInstances: []
+      chartInstances: [],
+      editingId: null,
+      editForm: {
+        amount: 0,
+        totalARS: 0
+      }
     };
   },
   computed: {
     transactions() {
       return this.$store.getters.getTransactions;
-    },    formattedBalance() {
+    },    
+    formattedBalance() {
       const balance = this.$store.getters.getCurrentUserBalance;
       return balance.toLocaleString('es-AR');
-
     },    // esto es el grafico
     buyData() {
       const result = {};
@@ -267,63 +291,38 @@ export default {
     },
 
     deleteTransaction(id) {
-      this.$store.commit("deleteTransaction", id);
+       if(confirm("¿Estás seguro de que deseas eliminar esta transacción?")) {
+          this.$store.commit("deleteTransaction", id);
+       }
     },
     editTx(tx) {
-      const newMoney = prompt(`Ingrese el nuevo monto en ARS para ${tx.crypto}:`, tx.totalARS);
-      
-      if (newMoney === null) {
-        return; // Usuario canceló
-      }
-      
-      const moneyValue = parseFloat(newMoney);
-      if (isNaN(moneyValue) || moneyValue <= 0) {
-        alert("Ingrese un monto válido mayor a 0");
+      this.editingId = tx.id;
+      this.editForm.amount = tx.amount;
+      this.editForm.totalARS = tx.totalARS;
+    },
+    cancelEdit() {
+      this.editingId = null;
+      this.editForm.amount = 0;
+      this.editForm.totalARS = 0;
+    },
+    saveEdit(tx) {
+      if (this.editForm.amount <= 0 || this.editForm.totalARS <= 0) {
+        // En un caso real usaría una notificación mejor, pero para mantener simple
+        // solo evitamos el guardado si es inválido.
+        alert("La cantidad y el total deben ser mayores a 0");
         return;
       }
-      tx.totalARS = moneyValue;
-      
-      // Si existe ID de API remota, hacer PATCH
-      if (tx._id) {
-        this.updateTransactionInAPI(tx._id, moneyValue);
-      } else {
-        alert("Transacción actualizada localmente");
-      }
-    },
-    async updateTransactionInAPI(id, newMoney) {
-      try {
-        const response = await fetch(`https://laboratorio3-f36a.restdb.io/rest/transactions/${id}`, {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-apikey': '60eb09146661365596af552f'
-          },
-          body: JSON.stringify({ money: newMoney.toString() })
-        });
-        
-        if (!response.ok) {
-            //esto esta puesto por si rompe la primera
-          // Intenta con la API alternativa
-          const fallbackResponse = await fetch(`https://labor3-d60e.restdb.io/rest/transactions/${id}`, {
-            method: 'PATCH',
-            headers: {
-              'Content-Type': 'application/json',
-              'x-apikey': 'd9002945094e72b41fbcfa71d2bcd0f4a540b'
-            },
-            body: JSON.stringify({ money: newMoney.toString() })
-          });
-          
-          if (!fallbackResponse.ok) {
-            throw new Error('Error actualizando transacción');
-          }
-          alert("Transacción actualizada exitosamente");
-        } else {
-          alert("Transacción actualizada exitosamente");
-        }
-      } catch (error) {
-        console.error("Error al actualizar:", error);
-        alert("Error al actualizar la transacción en la API");
-      }
+
+      const updatedTx = {
+         ...tx,
+         amount: this.editForm.amount,
+         totalARS: this.editForm.totalARS,
+         // Recalcular precio unitario implicito para consistencia
+         price: this.editForm.totalARS / this.editForm.amount 
+      };
+
+      this.$store.commit("editTransaction", updatedTx);
+      this.cancelEdit();
     },
   },
 };
@@ -466,6 +465,36 @@ button:hover {
 button:active {
   transform: scale(0.98);
 }
+.actions-cell {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+}
+
+.btn-edit, .btn-save {
+    background-color: #2d7a3e;
+    color: white;
+    border: none;
+}
+.btn-edit:hover, .btn-save:hover {
+    background-color: #236832;
+}
+
+.btn-delete, .btn-cancel {
+    background-color: #d9534f;
+    color: white;
+    border: none;
+}
+.btn-delete:hover, .btn-cancel:hover {
+    background-color: #c9302c;
+}
+
+.edit-input {
+    width: 80px;
+    padding: 4px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
 
 p {
   text-align: center;
@@ -521,7 +550,6 @@ p {
   th, td {
     padding: 8px;
   }
-
   .chart-container {
     width: 100px;
     height: 100px;
