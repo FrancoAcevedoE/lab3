@@ -152,11 +152,14 @@ export default {
         amount: this.cant,
         price: price,
         totalARS: totalARS,
-        date: new Date().toLocaleDateString('es-AR')
+        date: new Date().toLocaleString('es-AR')
       };
       
       // Guardar en el store de Vuex
       this.$store.commit('addTransaction', transaction);
+      
+      // Guardar en API remota
+      await this.saveTransactionToAPI(transaction);
       
       if (this.action === "purchase") {
         alert(
@@ -166,6 +169,59 @@ export default {
         alert(
           `venta realizada \nCrypto: ${this.cryptoSelected}\nRecibido: $${totalARS} ARS`,
         );
+      }
+    },
+    async saveTransactionToAPI(transaction) {
+      try {
+        const response = await fetch('https://laboratorio3-f36a.restdb.io/rest/transactions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-apikey': '60eb09146661365596af552f'
+          },
+          body: JSON.stringify({
+            user_id: transaction.userID,
+            action: transaction.type,
+            crypto_code: transaction.crypto,
+            crypto_amount: transaction.amount,
+            money: transaction.totalARS.toString(),
+            datetime: transaction.date
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error('Error en API principal');
+        }
+        
+        const data = await response.json();
+        // Guardar el _id de la API en la transacción local para poder editarla después
+        transaction._id = data._id;
+      } catch (error) {
+        console.log("Intentando API alternativa...", error);
+        try {
+          const fallbackResponse = await fetch('https://labor3-d60e.restdb.io/rest/transactions', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-apikey': 'd9002945094e72b41fbcfa71d2bcd0f4a540b'
+            },
+            body: JSON.stringify({
+              user_id: transaction.userID,
+              action: transaction.type,
+              crypto_code: transaction.crypto,
+              crypto_amount: transaction.amount,
+              money: transaction.totalARS.toString(),
+              datetime: transaction.date
+            })
+          });
+          
+          if (fallbackResponse.ok) {
+            const data = await fallbackResponse.json();
+            transaction._id = data._id;
+          }
+        } catch (fallbackError) {
+          console.error("Error en ambas APIs:", fallbackError);
+        }
       }
     },
   },

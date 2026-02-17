@@ -48,5 +48,4 @@ export default createStore({
   }
 });
 
-// axios se configuro en un servicio independiente para poder reutilizar la configuracion 
-// en otros archivos, incluye la api key y manejo de sesion con jwt
+
