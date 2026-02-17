@@ -27,6 +27,14 @@ export default {
   components: {
     LoginView
   },
+  mounted() {
+    // Cargar userID de localStorage al iniciar
+    // Al hacer setUser, automáticamente se cargarán sus transacciones del localStorage
+    const savedUserID = localStorage.getItem("userID");
+    if (savedUserID) {
+      this.$store.commit("setUser", savedUserID);
+    }
+  },
   computed: {
     isAuthenticated() {
       return !!this.$store.state.userID;
@@ -35,6 +43,8 @@ export default {
   methods: {
     logout() {
       this.$store.commit('logout');
+      localStorage.removeItem("userID");
+      // No remover las transacciones ya que contienen datos de otros usuarios
       this.$router.push('/login');
     }
   }

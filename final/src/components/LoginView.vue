@@ -92,8 +92,9 @@ export default {
         return;
       }
 
-      // guarda en Vuex
+      // guarda en Vuex y localStorage
       this.$store.commit("setUser", this.user.userID);
+      localStorage.setItem("userID", this.user.userID);
       // alert("login successful");
       console.log(this.$store);
       // redirigir a la vista principal una vez autenticado
