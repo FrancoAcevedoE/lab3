@@ -1,23 +1,22 @@
-ouWallet App
-A cryptocurrency trading web application built with a Node.js backend and a Vue.js frontend.
+YouWallet App
 
-Project Structure
-backend: Node.js/Express server that interacts with the Criptoya API.
-final: Vue.js frontend application.
-Prerequisites
+Es una app de compra y venta de cryptomonedas, lejos de ser operativa pero hecha como muestra.
+El backend esta hecho con Node.js/Express server para interactuar con la API de Cryptoya.
+
+Final: Vue.js frontend app.
+
+Requisitos:
 Node.js (v20+ recommended)
 npm
-Installation
-Clone the repository.
-Install dependencies: Run the following command in the root directory to install dependencies for the root, backend, and frontend:
-npm run install-all
-Alternatively, you can install them manually:
-Root: npm install
-Backend: cd backend && npm install
-Frontend: cd final && npm install
-Running the Application
-To start both the backend and frontend servers concurrently:
 
+Instalación:
+Clonar el repositorio.
+Instalar dependencias desde el directorio base con: npm run install-all.
+Alternativa:
+  Pararse en la ruta Backend = cd backend && npm install
+  Pararse en la ruta final que es el frontend = cd final && npm install
+
+Correr la App con:
 npm run dev
 Backend: Runs on http://localhost:3001
 Frontend: Runs on http://localhost:8080
