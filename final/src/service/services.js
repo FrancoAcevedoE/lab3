@@ -1,9 +1,9 @@
 import axios from "axios";
 
 const apiClient = axios.create({
-  baseURL: "https://laboratorio3-f36a.restdb.io/rest",
+  //se reemplazo la key directamente por el llamado al backend
+  baseURL: "http://localhost:3001",
   headers: {
-    "x-apikey": "60eb09146661365596af552f",
     "Content-Type": "application/json",
   },
 });

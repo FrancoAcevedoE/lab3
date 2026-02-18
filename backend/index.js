@@ -1,9 +1,15 @@
+require("dotenv").config();
 const express = require("express");
 const axios = require("axios");
 const cors = require("cors");
 
 const app = express();
 const PORT = 3001;
+
+//solucion de error la key queda publica
+const RESTDB_APIKEY = process.env.RESTDB_APIKEY;
+const RESTDB_URL = "https://laboratorio3-f36a.restdb.io/rest/transactions";
+
 
 // Configuración de CORS para el front
 app.use(cors({
@@ -35,7 +41,28 @@ app.get("/cryptos", (req, res) => {
   ]);
 });
 
+app.post("/transactions", async (req, res) => {
+  try {
+    const transaction = req.body;
 
+    const response = await axios.post(
+      RESTDB_URL,
+      transaction,
+      {
+        headers: {
+          "x-apikey": RESTDB_APIKEY,
+          "Content-Type": "application/json"
+        }
+      }
+    );
+
+    res.json(response.data);
+
+  } catch (error) {
+    console.error("Error guardando en RestDB:", error.response?.data || error.message);
+    res.status(500).json({ error: "Error saving transaction" });
+  }
+});
 
 
 app.listen(PORT, () => {
